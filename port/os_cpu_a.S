@@ -178,7 +178,7 @@ INTERRUPTION:
 *                                        + 0x84    GPR[30]
 *                                        + 0x88    GPR[31]                       (HIGH Memory)
 *                              
-* Note(s): 1) OSTaskStkInit(), which is responsible for initializing each task's stack, sets bit 0 of the
+* Note(s): 1) OSTaskStkInit(), which is responsible for initializing each task''s stack, sets bit 0 of the
 *             entry corresponding to the Status register.  Thus, interrupts will be enabled when each
 *             task first runs.
 *********************************************************************************************************
@@ -210,7 +210,7 @@ OSStartHighRdy:
     /************************* ?????? ?????? ******************************/
     la    $8,  OSTCBHighRdy                    /* Update the current TCB                               */
     lw    $9,  0($8) 
-    lw    $29, 0($9)                           /* Load the new task's stack pointer                    */
+    lw    $29, 0($9)                           /* Load the new task''s stack pointer                    */
 
     lw    $8,  STK_OFFSET_SR($29)              /* Restore the Status register                          */
     mtc0  $8,  $12
@@ -282,7 +282,7 @@ OSStartHighRdy:
 *                  Execute an eret instruction to begin executing the new task;
 *
 *              Upon entry, the registers of the task being suspended have already been saved onto that
-*              task's stack and the SP for the task has been saved in its OS_TCB by the ISR.
+*              task''s stack and the SP for the task has been saved in its OS_TCB by the ISR.
 *
 *              The stack frame of the task to resume is assumed to look as follows:
 *
@@ -335,7 +335,7 @@ OSIntCtxSw:
     sw    $9,  0($10)
 
     /************************* ?????? ?????? ******************************/
-    lw    $29, 0($9)                           /* Load the new task's stack pointer                    */
+    lw    $29, 0($9)                           /* Load the new task''s stack pointer                    */
 
     lw    $8,  STK_OFFSET_SR($29)              /* Restore the Status register                          */
     mtc0  $8,  $12
@@ -446,10 +446,10 @@ OS_CPU_SR_Restore:
 *********************************************************************************************************
 *                                          InterruptHandler
 *
-* Description: This function handles all generated hardware interrupts, saving the current task's
+* Description: This function handles all generated hardware interrupts, saving the current task''s
 *              context. The task is then restored once the pending interrupts have been processed.
 *
-*              The interrupted task's context is saved onto its stack as follows:
+*              The interrupted task''s context is saved onto its stack as follows:
 *
 *
 *              OSTCBHighRdy->OSTCBStkPtr + 0x00    Free Entry                    (LOW Memory)
@@ -543,7 +543,7 @@ InterruptHandler:
     bne   $0,  $9, TICK_INC_NESTING
     nop
     // OSIntNesting??????????????
-    /* Save the current task's stack pointer */
+    /* Save the current task''s stack pointer */
     la    $10, OSTCBCur                        
     lw    $11, 0($10)
     sw    $29, 0($11)
@@ -671,10 +671,10 @@ INT_LOOP_END:
 *********************************************************************************************************
 *                                          ExceptionHandler
 *
-* Description: This function handles all generated exceptions, saving the current task's context. The
+* Description: This function handles all generated exceptions, saving the current task''s context. The
 *              task is then restored once the pending interrupts have been processed.
 *
-*              The interrupted task's context is saved onto its stack as follows:
+*              The interrupted task''s context is saved onto its stack as follows:
 *
 *
 *              OSTCBHighRdy->OSTCBStkPtr + 0x00    Free Entry                    (LOW Memory)
@@ -747,7 +747,7 @@ ExceptionHandler:
     mfc0  $8,  $12
     sw    $8,  STK_OFFSET_SR($29)
 
-    la    $10, OSTCBCur                        /* Save the current task's stack pointer                */
+    la    $10, OSTCBCur                        /* Save the current task''s stack pointer                */
     lw    $11, 0($10)
     sw    $29, 0($11)
 
@@ -770,7 +770,7 @@ ExceptionHandler:
     la    $10, OSTCBCur
     lw    $9,  0($10)
 
-    lw    $29, 0($9)                           /* Load the new task's stack pointer                    */
+    lw    $29, 0($9)                           /* Load the new task''s stack pointer                    */
 
     lw    $8,  STK_OFFSET_SR($29)              /* Restore the Status register                          */
     mtc0  $8,  $12
