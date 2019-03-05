@@ -58,6 +58,8 @@ clean:
 	rm -f System.map
 	rm -f *.coe *.mif *.asm *.om *.bin
 	find . -name ".depend" | xargs rm -f
+	rm -rf obj/
+	rm -f convert
 
 distclean: clean
 	find . -type f \
