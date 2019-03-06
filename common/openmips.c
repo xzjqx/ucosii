@@ -1,26 +1,25 @@
 #include "includes.h"
 
 
-#define BAYES_REG0_ADDR   0xbff00000   // 锟??31浣嶈〃绀簊tart锛岀30浣嶈〃绀簐alid
-#define BAYES_REG1_ADDR   0xbff00004   // 鍒嗙被缁撴灉
-#define BAYES_REG2_ADDR   0xbff00008   // 鎺ユ敹浠嶢XI浼犻�掔殑鏁版嵁锛岃〃绀虹鍑犲箙鍥剧墖
-#define BAYES_REG3_ADDR   0xbff0000C   // 缁撴灉鏈夋晥
+#define BAYES_REG0_ADDR   0xbff00000   
+#define BAYES_REG1_ADDR   0xbff00004   
+#define BAYES_REG2_ADDR   0xbff00008   
+#define BAYES_REG3_ADDR   0xbff0000C   
 
 #define LED_ADDR          0xbfd0f000
 #define LED_RGB0_ADDR     0xbfd0f100
 #define LED_RGB1_ADDR     0xbfd0f104
-#define NUM_ADDR          0xbfd0f200
-#define SWITCH_ADDR       0xbfd0f300
 
-/*
-#define BAYES_REG0   (* (volatile unsigned *)  BAYES_REG0_ADDR  )
-#define BAYES_REG1   (* (volatile unsigned *)  BAYES_REG1_ADDR  )
-#define BAYES_REG2   (* (volatile unsigned *)  BAYES_REG2_ADDR  )
-#define BAYES_REG3   (* (volatile unsigned *)  BAYES_REG2_ADDR  )
-*/
-#define VGA_REG0_ADDR   0xbfb10000   // 1涓哄紑锟??
+#define TIMER_BASE        0xbfd30000
+#define TIMER_TCSR0       0x0           // 计数器0的状态/控制寄存器
+#define TIMER_TLR0        0x4           // 计数器0的加载寄存器
+#define TIMER_TCR0        0x8           // 计数器0的计数寄存器
+#define TIMER_TCSR1       0x10          // 计数器1的状态/控制寄存器
+#define TIMER_TLR1        0x14          // 计数器1的加载寄存器
+#define TIMER_TCR1        0x18          // 计数器1的计数寄存器
 
-//#define VGA_REG0   (* (volatile unsigned *)  VGA_REG0_ADDR  )
+#define VGA_REG0_ADDR     0xbfd40000   
+
 
 
 #define BOTH_EMPTY (UART_LS_TEMT | UART_LS_THRE)
@@ -101,15 +100,25 @@ INT32U gpio_in()
 	return temp;
 }
 
+void timer_init()
+{
+    REG32(TIMER_BASE + TIMER_TCSR0) = 0;
+    REG32(TIMER_BASE + TIMER_TCSR1) = 0;
+}
+
 /*******************************************
 ********************************************/
 void OSInitTick(void)
 {
     INT32U compare = (INT32U)(IN_CLK / OS_TICKS_PER_SEC);
     
-    asm volatile("mtc0   %0,$9"   : :"r"(0x0)); 
-    asm volatile("mtc0   %0,$11"   : :"r"(compare));  
+    // asm volatile("mtc0   %0,$9"   : :"r"(0x0)); 
+    // asm volatile("mtc0   %0,$11"   : :"r"(compare));  
     asm volatile("mtc0   %0,$12"   : :"r"(0x10000401));
+
+    REG32(TIMER_BASE + TIMER_TLR0) = compare;
+    REG32(TIMER_BASE + TIMER_TCR0) = 0;
+    REG32(TIMER_BASE + TIMER_TCSR0) = 0x000000f2;
     
     return; 
 }
@@ -152,8 +161,6 @@ void main()
     uart_init();
 
     // gpio_init();	
-
-    // OSTaskCreate(TaskStart, (void *)0, &TaskStartStk[TASK_STK_SIZE - 1], 0);
 	
 	OSTaskCreate(TaskStart, (void *)0, &TaskStartStk[TASK_STK_SIZE - 1], 0);
 
