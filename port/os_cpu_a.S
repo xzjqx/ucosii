@@ -847,7 +847,7 @@ ExceptionHandler:
 TickInterruptClear:
 
     // ????CP0??compare??????0????????????
-    mtc0  $0,  $11                              /* Set up the period in the compare reg*/
+    // mtc0  $0,  $11                              /* Set up the period in the compare reg*/
     jr    $31
     nop
 
@@ -870,9 +870,9 @@ TickInterruptClear:
 CoreTmrInit:
 
     // ?????CP0??compare?????????count????
-    mtc0  $4,  $11                              /* Set up the period in the compare reg                */
+    // mtc0  $4,  $11                              /* Set up the period in the compare reg                */
     nop
-    mtc0  $0,  $9                               /* Clear the count reg                                 */
+    // mtc0  $0,  $9                               /* Clear the count reg                                 */
     jr    $31
     nop
 
@@ -901,9 +901,10 @@ TickISR:
     sw $31, 0xC($29)
 
     /************************* ????? ???compare????? ******************************/
-    mfc0  $8,  $11                              /* Get the old compare time                            */
-    addu  $8,  $4                               /* Add the increment value BSP_TMR_RELOAD              */
-    mtc0  $8,  $11                              /* Set up the period in the compare reg                */
+    // mfc0  $8,  $11                              /* Get the old compare time                            */
+    // addu  $8,  $4                               /* Add the increment value BSP_TMR_RELOAD              */
+    // mtc0  $8,  $11                              /* Set up the period in the compare reg                */
+    
 
     /************************* ?????? ????OSTimeTick???? ******************************/
     la    $8,  OSTimeTick                       /* Call OSTimeTick() to signal to the OS a clock tick  */
