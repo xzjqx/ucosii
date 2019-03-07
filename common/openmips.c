@@ -90,20 +90,37 @@ void gpio_init()
 
 void gpio_out(INT32U number)
 {
-    REG32(NUM_ADDR) = number;
+    // REG32(NUM_ADDR) = number;
 }
 
 INT32U gpio_in()
 {
 	INT32U temp = 0;
-	temp = REG32(SWITCH_ADDR);
+	// temp = REG32(SWITCH_ADDR);
 	return temp;
 }
 
 void timer_init()
 {
-    REG32(TIMER_BASE + TIMER_TCSR0) = 0;
-    REG32(TIMER_BASE + TIMER_TCSR1) = 0;
+    // SOC_TIMER_TLR0 = 0x7fffffff;
+    // REG32(TIMER_BASE + TIMER_TCSR1) = 0;
+    INT32U TCSR0 = REG32(TIMER_BASE + TIMER_TCSR0);
+	TCSR0 |= 0x00000020; // 将某个控制/状态寄存器（TCSR0或TCSR1）中的LOAD位（第5位）置为1，把加载寄存器中的初始计数值存入到对应的内部计数器中
+	REG32(TIMER_BASE + TIMER_TCSR0) = TCSR0;
+
+	TCSR0 = REG32(TIMER_BASE + TIMER_TCSR0);
+	// TCSR0 &= 0xffffffef; // 通过设置TCSR0或TCSR1中的ARHT位（第4位）来决定当定时器计时到期后，内部计数器是暂停还是重新加载初始计数值继续计数
+	TCSR0 |= 0x00000010;
+    REG32(TIMER_BASE + TIMER_TCSR0) = TCSR0;
+
+	TCSR0 = REG32(TIMER_BASE + TIMER_TCSR0);
+	TCSR0 |= 0x00000002; // 通过设置TCSR0或TCSR1中的UDT位（第1位），来决定计数器是递增计数还是递减计数
+	REG32(TIMER_BASE + TIMER_TCSR0) = TCSR0;
+
+	TCSR0 = REG32(TIMER_BASE + TIMER_TCSR0);
+	// TCSR0 &= 0xffffffbf; // 通过设置TCSR0或TCSR1中的ENIT位（第6位）来决定是否使能中断
+	TCSR0 |= 0x00000040;
+    REG32(TIMER_BASE + TIMER_TCSR0) = TCSR0;
 }
 
 /*******************************************
@@ -117,8 +134,16 @@ void OSInitTick(void)
     asm volatile("mtc0   %0,$12"   : :"r"(0x10000401));
 
     REG32(TIMER_BASE + TIMER_TLR0) = compare;
-    REG32(TIMER_BASE + TIMER_TCR0) = 0;
-    REG32(TIMER_BASE + TIMER_TCSR0) = 0x000000f2;
+    timer_init();
+    INT32U TCSR0 = REG32(TIMER_BASE + TIMER_TCSR0);
+	TCSR0 &= 0xffffffdf; 
+	REG32(TIMER_BASE + TIMER_TCSR0) = TCSR0;
+
+	TCSR0 = REG32(TIMER_BASE + TIMER_TCSR0);
+	TCSR0 |= 0x00000080; 
+	REG32(TIMER_BASE + TIMER_TCSR0) = TCSR0;
+    // REG32(TIMER_BASE + TIMER_TCR0) = 0;
+    // REG32(TIMER_BASE + TIMER_TCSR0) = 0x000000f2;
     
     return; 
 }
@@ -140,7 +165,7 @@ void  TaskStart (void *pdata)
     pdata = pdata;          // Prevent compiler warning
     OSInitTick();	        // don't put this function in main()       
     for (;;) {
-       if(count <= 36)
+       if(count < 36)
         {
             // REG32(UART_BASE + UART_RT) = Info[count];
             uart_putc(Info[count]);
@@ -149,7 +174,7 @@ void  TaskStart (void *pdata)
         count=count+1;
         // gpio_out(count);
         // count=count+2;
-        OSTimeDly(10);      // Wait 10ms
+        OSTimeDly(2);      // Wait 10ms
     }
     
 }
@@ -158,7 +183,7 @@ void main()
 {
     OSInit();
 
-    uart_init();
+    // uart_init();
 
     // gpio_init();	
 	
