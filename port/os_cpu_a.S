@@ -531,17 +531,6 @@ InterruptHandler:
     mfc0  $8,  $12
     sw    $8,  STK_OFFSET_SR($29)
 
-    /* 将TIMER中状态控制寄存器TCSR0的第8位(INT)置1，以清除中断 */
-    lui   $8,  0xbfd3
-    lw    $9,  0($8)
-    ori   $9,  0x0100
-    sw    $9,  0($8)
-    lw    $9,  0($8)
-    lw    $9,  4($8)
-    lw    $9,  8($8)
-    lw    $9,  4($8)
-    lw    $9,  8($8)
-
     /************************* ????? ????OSIntNesting??? ******************************/
     /* ???OSIntNesting???  */
     la    $8,  OSIntNesting                    
@@ -916,6 +905,16 @@ TickISR:
     // mfc0  $8,  $11                              /* Get the old compare time                            */
     // addu  $8,  $4                               /* Add the increment value BSP_TMR_RELOAD              */
     // mtc0  $8,  $11                              /* Set up the period in the compare reg                */
+    /* 将TIMER中状态控制寄存器TCSR0的第8位(INT)置1，以清除中断 */
+    lui   $8,  0xbfd3
+    lw    $9,  0($8)
+    ori   $9,  0x0100
+    sw    $9,  0($8)
+    // lw    $9,  0($8)
+    // lw    $9,  4($8)
+    // lw    $9,  8($8)
+    // lw    $9,  4($8)
+    // lw    $9,  8($8)
     
 
     /************************* ?????? ????OSTimeTick???? ******************************/

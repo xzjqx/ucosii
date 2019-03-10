@@ -25,3 +25,4 @@ ucos/os_tmr.o
 ucos/ucos.o
 .vscode/settings.json
 convert
+trace.txt
